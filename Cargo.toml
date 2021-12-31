@@ -1,6 +1,6 @@
 [package]
 name = "hexxd"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Standalone `xxd` replacement intended for Neovim users"
 authors = ["Zachary Frost <zfzackfrost@pm.me>"]
@@ -27,5 +27,3 @@ categories = [
 
 [dependencies]
 structopt = "0.3.25"
-regex = "1.5.4"
-lazy_static = "1.4.0"
