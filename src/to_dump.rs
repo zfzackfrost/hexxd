@@ -57,7 +57,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
         // Write the row  index using (ri * cols) for the value
         write_index(&mut w, upper, ri * (cols as usize))?;
 
-        let mut row_chars = Vec::new();
+        let mut row_bytes = Vec::new();
         let mut current_row_n_spaces: usize = 0;
         for group in col {
             for b in group {
@@ -76,7 +76,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
                 }
 
                 // Keep track of all of the bytes written for this row
-                row_chars.push(*b);
+                row_bytes.push(*b);
             }
 
             // Write group spaces, if any
@@ -94,7 +94,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
         // Add spaces for alignment of decoded text
         if ri == last_ri {
             // The actual number of characters written for the current row
-            let current_row_n_chars = (row_chars.len() * 2) + (current_row_n_spaces * gspace.len());
+            let current_row_n_chars = (row_bytes.len() * 2) + (current_row_n_spaces * gspace.len());
 
             // The actual number of characters written for the first row
             let first_row_n_chars = (first_row_n_bytes * 2) + (first_row_n_spaces * gspace.len());
@@ -110,7 +110,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
             }
         }
         // Write decoded text at end of row
-        write_decoded(&mut w, row_chars)?;
+        write_decoded(&mut w, row_bytes)?;
 
         // Write newline at end of row
         writeln!(w).map_err(|x| HexxdError::from(x))?;

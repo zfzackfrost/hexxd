@@ -8,8 +8,23 @@ use std::io::prelude::*;
 fn main() {
     let cli = Cli::from_args();
     
-    let ifile = cli.clone().ipath.map(|p| File::open(p).unwrap());
-    let ofile = cli.clone().opath.map(|p| File::create(p).unwrap());
+    let ifile = {
+        let ipath = cli.clone().ipath;
+        if ipath == "-" {
+            None
+        } else {
+            Some(File::open(ipath).unwrap())
+        }
+    };
+    let ofile = {
+        let opath = cli.clone().opath;
+        if opath == "-" {
+            None
+        } else {
+            Some(File::create(opath).unwrap())
+        }
+    };
+
 
     let reader: Box<dyn Read> = if let Some(ifile) = ifile {
         Box::new(ifile)

@@ -58,11 +58,11 @@ pub struct Cli {
     #[structopt(short, long, default_value = "2", validator = validate_groupsize)]
     pub groupsize: u8,
 
-    /// Input file path. If omitted will use STDIN.
-    #[structopt(name = "INPUT")]
-    pub ipath: Option<String>,
+    /// Input file path. If omitted will use STDIN. Use "-" to specify STDIN explicitly.
+    #[structopt(name = "INPUT", default_value = "-")]
+    pub ipath: String,
 
-    /// Output file path. If omitted will use STDOUT.
-    #[structopt(name = "OUTPUT")]
-    pub opath: Option<String>,
+    /// Output file path. If omitted will use STDOUT. Use "-" to specify STDOUT explicitly.
+    #[structopt(name = "OUTPUT", default_value = "-")]
+    pub opath: String,
 }
