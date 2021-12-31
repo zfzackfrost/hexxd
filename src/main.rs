@@ -7,7 +7,7 @@ use std::io::prelude::*;
 
 fn main() {
     let cli = Cli::from_args();
-
+    
     let ifile = cli.clone().ipath.map(|p| File::open(p).unwrap());
     let ofile = cli.clone().opath.map(|p| File::create(p).unwrap());
 
@@ -23,9 +23,16 @@ fn main() {
         Box::new(std::io::stdout())
     };
     
-    if !cli.revert {
-        dump_binary(cli, writer, reader);
+
+    let debug = cli.debug;
+    let r = if !cli.revert {
+        dump_binary(cli, writer, reader)
     } else {
-        undump_binary(cli, writer, reader);
+        undump_binary(cli, writer, reader)
+    };
+    if let Err(err) = r {
+        if debug {
+            eprintln!("{}", err);
+        }
     }
 }

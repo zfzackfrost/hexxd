@@ -34,6 +34,10 @@ fn validate_groupsize(v: String) -> Result<(), String> {
 #[derive(StructOpt, Debug, Clone)]
 #[structopt(name = "hexxd")]
 pub struct Cli {
+    /// Display debug and error information
+    #[structopt(long)]
+    pub debug: bool,
+
     /// Reverse operation: convert hexdump to binary
     #[structopt(short, long)]
     pub revert: bool,

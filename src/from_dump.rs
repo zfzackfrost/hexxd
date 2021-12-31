@@ -1,4 +1,5 @@
 use crate::cli::Cli;
+use crate::error::HexxdError;
 use std::io::prelude::*;
 
 fn strip_decoded(line: &str) -> &str {
@@ -45,11 +46,11 @@ fn is_whitespace_or_empty(s: &str) -> bool {
     return s.is_empty() || s.chars().all(|c| c.is_whitespace());
 }
 
-pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
+pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Result<(), HexxdError> {
     // Read all input into a string
     let data_str = {
         let mut s = String::new();
-        r.read_to_string(&mut s).unwrap();
+        r.read_to_string(&mut s).map_err(|x| HexxdError::from(x))?;
         s
     };
 
@@ -75,7 +76,7 @@ pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
 
         //------------- Hex String to Bytes -------------//
 
-        // Create iterator for evert two character in the hex string
+        // Create iterator for every two characters in the hex string
         // NOTE: Evey character is a hex digit from the dump
         let chars = s.chars();
         let chars: Vec<_> = chars.collect();
@@ -84,10 +85,11 @@ pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
         // Loop over every two characters in the hex string
         for chunk in chunks {
             // Create byte (u8) from two hex digits
-            let byte = u8::from_str_radix(&chunk, 16).unwrap();
+            let byte = u8::from_str_radix(&chunk, 16).map_err(|x| HexxdError::from(x))?;
 
             // Write byte to output
-            w.write(&[byte]).unwrap();
+            w.write(&[byte]).map_err(|x| HexxdError::from(x))?;
         }
     }
+    Ok(())
 }

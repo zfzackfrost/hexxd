@@ -1,35 +1,38 @@
 use crate::cli::Cli;
+use crate::error::HexxdError;
+
 use std::io::prelude::*;
 
-fn write_index(w: &mut Box<dyn Write>, upper: bool, idx: usize) {
+fn write_index(w: &mut Box<dyn Write>, upper: bool, idx: usize) -> Result<(), HexxdError> {
     // Write the row index
     if upper {
         // Write the row index as uppercase hex number
-        write!(w, "{:08X}: ", idx).unwrap();
+        write!(w, "{:08X}: ", idx).map_err(|x| HexxdError::from(x))
     } else {
         // Write the row index as lowercase hex number
-        write!(w, "{:08x}: ", idx).unwrap();
+        write!(w, "{:08x}: ", idx).map_err(|x| HexxdError::from(x))
     }
 }
-fn write_text(w: &mut Box<dyn Write>, bin: Vec<u8>) {
+fn write_decoded(w: &mut Box<dyn Write>, bin: Vec<u8>) -> Result<(), HexxdError> {
     // Decode byte Vec to String
-    let s = String::from_utf8(bin).unwrap();
+    let s = String::from_utf8(bin).map_err(|x| HexxdError::from(x))?;
 
     // Replace certain characters with "."
-    let s = s.replace("\n", ".");
-    let s = s.replace("\t", ".");
-    let s = s.replace("\r", ".");
-    let s = s.replace("\0", ".");
+    let s = s
+        .replace("\n", ".")
+        .replace("\t", ".")
+        .replace("\r", ".")
+        .replace("\0", ".");
 
     // Write space followed by the decoded text
-    write!(w, " {}", s).unwrap();
+    write!(w, " {}", s).map_err(|x| HexxdError::from(x))
 }
 
-pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
+pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Result<(), HexxdError> {
     let mut binary = Vec::new();
-    r.read_to_end(&mut binary).unwrap();
+    r.read_to_end(&mut binary).map_err(|x| HexxdError::from(x))?;
     if binary.is_empty() {
-        return;
+        return Ok(());
     }
 
     let upper = cli.upper;
@@ -52,7 +55,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
 
     for (ri, col) in rows.enumerate() {
         // Write the row  index using (ri * cols) for the value
-        write_index(&mut w, upper, ri * (cols as usize));
+        write_index(&mut w, upper, ri * (cols as usize))?;
 
         let mut row_chars = Vec::new();
         let mut current_row_n_spaces: usize = 0;
@@ -62,14 +65,14 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
                 if ri == 0 {
                     first_row_n_bytes += 1;
                 }
-                
+
                 // Write the byte as a 2-digit hex number
                 if upper {
                     // Write as uppercase hex
-                    write!(w, "{:02X}", b).unwrap();
+                    write!(w, "{:02X}", b).map_err(|x| HexxdError::from(x))?;
                 } else {
                     // Write as lowercase hex
-                    write!(w, "{:02x}", b).unwrap();
+                    write!(w, "{:02x}", b).map_err(|x| HexxdError::from(x))?;
                 }
 
                 // Keep track of all of the bytes written for this row
@@ -77,7 +80,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
             }
 
             // Write group spaces, if any
-            write!(w, "{}", gspace).unwrap();
+            write!(w, "{}", gspace).map_err(|x| HexxdError::from(x))?;
 
             // Count the number of spaces added to this row for alignment
             current_row_n_spaces += 1;
@@ -102,14 +105,15 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
             // Write extra spaces, if needed
             if extra_spaces > 0 {
                 for _ in 0..extra_spaces {
-                    write!(w, " ").unwrap();
+                    write!(w, " ").map_err(|x| HexxdError::from(x))?;
                 }
             }
         }
         // Write decoded text at end of row
-        write_text(&mut w, row_chars);
+        write_decoded(&mut w, row_chars)?;
 
         // Write newline at end of row
-        writeln!(w).unwrap();
+        writeln!(w).map_err(|x| HexxdError::from(x))?;
     }
+    Ok(())
 }
