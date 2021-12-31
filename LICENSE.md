@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright &copy; `2021` `Zachary Frost`
+Copyright &copy; `2022` `Zachary Frost`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
