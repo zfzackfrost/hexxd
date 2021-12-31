@@ -11,7 +11,7 @@ fn main() {
     let ifile = cli.clone().ipath.map(|p| File::open(p).unwrap());
     let ofile = cli.clone().opath.map(|p| File::create(p).unwrap());
 
-    let mut reader: Box<dyn Read> = if let Some(ifile) = ifile {
+    let reader: Box<dyn Read> = if let Some(ifile) = ifile {
         Box::new(ifile)
     } else {
         Box::new(std::io::stdin())
@@ -24,13 +24,8 @@ fn main() {
     };
     
     if !cli.revert {
-        let mut idata = Vec::new();
-        reader.read_to_end(&mut idata).unwrap();
-
-        if !idata.is_empty() {
-            dump_binary(writer, cli, idata);
-        }
+        dump_binary(cli, writer, reader);
     } else {
-        undump_binary(writer, cli, reader);
+        undump_binary(cli, writer, reader);
     }
 }

@@ -25,7 +25,13 @@ fn write_text(w: &mut Box<dyn Write>, bin: Vec<u8>) {
     write!(w, " {}", s).unwrap();
 }
 
-pub fn dump_binary(mut w: Box<dyn Write>, cli: Cli, binary: Vec<u8>) {
+pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
+    let mut binary = Vec::new();
+    r.read_to_end(&mut binary).unwrap();
+    if binary.is_empty() {
+        return;
+    }
+
     let upper = cli.upper;
     // let bits = cli.bits;
     let cols = cli.cols;

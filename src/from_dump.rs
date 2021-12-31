@@ -45,7 +45,7 @@ fn is_whitespace_or_empty(s: &str) -> bool {
     return s.is_empty() || s.chars().all(|c| c.is_whitespace());
 }
 
-pub fn undump_binary(mut w: Box<dyn Write>, _cli: Cli, mut r: Box<dyn Read>) {
+pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) {
     // Read all input into a string
     let data_str = {
         let mut s = String::new();
@@ -64,7 +64,7 @@ pub fn undump_binary(mut w: Box<dyn Write>, _cli: Cli, mut r: Box<dyn Read>) {
         }
 
         //------------- Isolate Hex String --------------//
-        
+
         // Remove the decoded text from the end of the line
         let s = strip_decoded(l);
         // Remove the index from the start of the line
