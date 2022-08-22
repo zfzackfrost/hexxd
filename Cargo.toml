@@ -1,6 +1,6 @@
 [package]
 name = "hexxd"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2021"
 description = "Standalone `xxd` replacement intended for Neovim users"
 authors = ["Zachary Frost <zfzackfrost@pm.me>"]
@@ -8,23 +8,17 @@ license = "MIT"
 homepage = "https://github.com/zfzackfrost/hexxd"
 repository = "https://github.com/zfzackfrost/hexxd"
 readme = "README.md"
-keywords = [
-    "developer",
-    "utility",
-    "hexdump",
-    "text-editor",
-    "command-line"
-]
+keywords = ["developer", "utility", "hexdump", "text-editor", "command-line"]
 categories = [
-    "command-line-utilities",
-    "development-tools",
-    "text-editors",
-    "emulators",
-    "encoding"
+  "command-line-utilities",
+  "development-tools",
+  "text-editors",
+  "emulators",
+  "encoding",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-structopt = "0.3.25"
+clap = { version = "3.2.17", features = ["derive"]}
 quick-error = "2.0.1"

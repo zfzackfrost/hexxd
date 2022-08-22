@@ -1,14 +1,14 @@
-pub use std::path::PathBuf;
-pub use structopt::StructOpt;
-use std::string::ToString;
+pub use clap::Parser;
 
-fn validate_cols(v: String) -> Result<(), String> {
-    let r = v.parse::<u32>();
+fn parse_cols(v: &str) -> Result<u8, String> {
+    let r = v.parse::<i64>();
     if let Ok(i) = r.clone() {
-        if i <= 0 ||  i >= 256 {
-            Err(String::from("`-c/--cols` must be between 1 and 256"))
+        if !(1..256).contains(&i) {
+            Err(String::from(
+                "`-c/--cols` must be between 1 and 255, inclusive",
+            ))
         } else {
-            Ok(())
+            Ok(i as u8)
         }
     } else {
         let err = r.unwrap_err();
@@ -16,13 +16,15 @@ fn validate_cols(v: String) -> Result<(), String> {
     }
 }
 
-fn validate_groupsize(v: String) -> Result<(), String> {
-    let r = v.parse::<u32>();
+fn parse_groupsize(v: &str) -> Result<u8, String> {
+    let r = v.parse::<i64>();
     if let Ok(i) = r.clone() {
-        if i >= 256 {
-            Err(String::from("`-g/--groupsize` must be between 0 and 256"))
+        if !(0..256).contains(&i) {
+            Err(String::from(
+                "`-g/--groupsize` must be between 0 and 255, inclusive",
+            ))
         } else {
-            Ok(())
+            Ok(i as u8)
         }
     } else {
         let err = r.unwrap_err();
@@ -31,38 +33,38 @@ fn validate_groupsize(v: String) -> Result<(), String> {
 }
 
 /// `xxd` replacement for Neovim
-#[derive(StructOpt, Debug, Clone)]
-#[structopt(name = "hexxd")]
+#[derive(Parser, Debug, Clone)]
+#[clap(author, version, about, long_about = None)]
 pub struct Cli {
     /// Display debug and error information
-    #[structopt(long)]
+    #[clap(long)]
     pub debug: bool,
 
     /// Reverse operation: convert hexdump to binary
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub revert: bool,
 
     /// Switch to bits (binary digits) dump, rather than hexdump
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub bits: bool,
 
     /// Uppercase hex letters. Default is lower case
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub upper: bool,
 
     /// Number of bytes to display per row
-    #[structopt(short, long, default_value = "16", validator = validate_cols)]
+    #[clap(short, long, default_value = "16", value_parser = parse_cols)]
     pub cols: u8,
 
     /// Number of bytes to group together in hexdump display
-    #[structopt(short, long, default_value = "2", validator = validate_groupsize)]
+    #[clap(short, long, default_value = "2", value_parser = parse_groupsize)]
     pub groupsize: u8,
 
     /// Input file path. If omitted will use STDIN. Use "-" to specify STDIN explicitly.
-    #[structopt(name = "INPUT", default_value = "-")]
+    #[clap(name = "INPUT", default_value = "-")]
     pub ipath: String,
 
     /// Output file path. If omitted will use STDOUT. Use "-" to specify STDOUT explicitly.
-    #[structopt(name = "OUTPUT", default_value = "-")]
+    #[clap(name = "OUTPUT", default_value = "-")]
     pub opath: String,
 }
