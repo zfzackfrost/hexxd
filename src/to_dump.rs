@@ -7,30 +7,30 @@ fn write_index(w: &mut Box<dyn Write>, upper: bool, idx: usize) -> Result<(), He
     // Write the row index
     if upper {
         // Write the row index as uppercase hex number
-        write!(w, "{:08X}: ", idx).map_err(|x| HexxdError::from(x))
+        write!(w, "{:08X}: ", idx).map_err(HexxdError::from)
     } else {
         // Write the row index as lowercase hex number
-        write!(w, "{:08x}: ", idx).map_err(|x| HexxdError::from(x))
+        write!(w, "{:08x}: ", idx).map_err(HexxdError::from)
     }
 }
 fn write_decoded(w: &mut Box<dyn Write>, bin: Vec<u8>) -> Result<(), HexxdError> {
     // Decode byte Vec to String
-    let s = String::from_utf8(bin).map_err(|x| HexxdError::from(x))?;
+    let s = String::from_utf8(bin).map_err(HexxdError::from)?;
 
     // Replace certain characters with "."
     let s = s
-        .replace("\n", ".")
-        .replace("\t", ".")
-        .replace("\r", ".")
-        .replace("\0", ".");
+        .replace('\n', ".")
+        .replace('\t', ".")
+        .replace('\r', ".")
+        .replace('\0', ".");
 
     // Write space followed by the decoded text
-    write!(w, " {}", s).map_err(|x| HexxdError::from(x))
+    write!(w, " {}", s).map_err(HexxdError::from)
 }
 
 pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Result<(), HexxdError> {
     let mut binary = Vec::new();
-    r.read_to_end(&mut binary).map_err(|x| HexxdError::from(x))?;
+    r.read_to_end(&mut binary).map_err(HexxdError::from)?;
     if binary.is_empty() {
         return Ok(());
     }
@@ -69,10 +69,10 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
                 // Write the byte as a 2-digit hex number
                 if upper {
                     // Write as uppercase hex
-                    write!(w, "{:02X}", b).map_err(|x| HexxdError::from(x))?;
+                    write!(w, "{:02X}", b).map_err(HexxdError::from)?;
                 } else {
                     // Write as lowercase hex
-                    write!(w, "{:02x}", b).map_err(|x| HexxdError::from(x))?;
+                    write!(w, "{:02x}", b).map_err(HexxdError::from)?;
                 }
 
                 // Keep track of all of the bytes written for this row
@@ -80,7 +80,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
             }
 
             // Write group spaces, if any
-            write!(w, "{}", gspace).map_err(|x| HexxdError::from(x))?;
+            write!(w, "{}", gspace).map_err(HexxdError::from)?;
 
             // Count the number of spaces added to this row for alignment
             current_row_n_spaces += 1;
@@ -105,7 +105,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
             // Write extra spaces, if needed
             if extra_spaces > 0 {
                 for _ in 0..extra_spaces {
-                    write!(w, " ").map_err(|x| HexxdError::from(x))?;
+                    write!(w, " ").map_err(HexxdError::from)?;
                 }
             }
         }
@@ -113,7 +113,7 @@ pub fn dump_binary(cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> Res
         write_decoded(&mut w, row_bytes)?;
 
         // Write newline at end of row
-        writeln!(w).map_err(|x| HexxdError::from(x))?;
+        writeln!(w).map_err(HexxdError::from)?;
     }
     Ok(())
 }

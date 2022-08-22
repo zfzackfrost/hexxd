@@ -28,17 +28,17 @@ fn strip_decoded(line: &str) -> &str {
     }
 
     // Return a new slice from the start to the end of the dump region
-    return &line[0..dump_end];
+    &line[0..dump_end]
 }
 
 fn strip_index(line: &str) -> &str {
     // Split at first space...
-    if let Some((_, right)) = line.split_once(" ") {
+    if let Some((_, right)) = line.split_once(' ') {
         // Return right hand side
         return right;
     }
     // Fail silently
-    return line;
+    line
 }
 
 // Check if string contains only whitespace characters or is empty
@@ -50,12 +50,12 @@ pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> 
     // Read all input into a string
     let data_str = {
         let mut s = String::new();
-        r.read_to_string(&mut s).map_err(|x| HexxdError::from(x))?;
+        r.read_to_string(&mut s).map_err(HexxdError::from)?;
         s
     };
 
     // Split data string by newlines
-    let lines = data_str.split("\n");
+    let lines = data_str.split('\n');
 
     // Loop over data string lines
     for l in lines {
@@ -72,7 +72,7 @@ pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> 
         let s = strip_index(s);
 
         // Remove spaces from hex dump
-        let s = s.replace(" ", "");
+        let s = s.replace(' ', "");
 
         //------------- Hex String to Bytes -------------//
 
@@ -85,10 +85,10 @@ pub fn undump_binary(_cli: Cli, mut w: Box<dyn Write>, mut r: Box<dyn Read>) -> 
         // Loop over every two characters in the hex string
         for chunk in chunks {
             // Create byte (u8) from two hex digits
-            let byte = u8::from_str_radix(&chunk, 16).map_err(|x| HexxdError::from(x))?;
+            let byte = u8::from_str_radix(&chunk, 16).map_err(HexxdError::from)?;
 
             // Write byte to output
-            w.write(&[byte]).map_err(|x| HexxdError::from(x))?;
+            w.write(&[byte]).map_err(HexxdError::from)?;
         }
     }
     Ok(())
